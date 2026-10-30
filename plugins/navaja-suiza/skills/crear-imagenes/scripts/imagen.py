@@ -4,7 +4,7 @@ Motores:
   space  Z-Image-Turbo o Qwen-Image en GPU gratis de Hugging Face (rápido, cuota
          diaria; necesita el secreto HF_TOKEN de una cuenta gratuita).
   local  Z-Image-Turbo en la CPU del servidor (sin límites ni cuentas, pero muy
-         lento: más de 15 min por imagen). Solo si la persona acepta la espera.
+         lento: unos 20 min por imagen a 576x768). Solo si la persona acepta la espera.
 
 Uso:
   imagen.py "prompt" ["otro prompt"...] [--formato 3:4] [--motor space]
@@ -22,7 +22,7 @@ from pathlib import Path
 CACHE = Path(os.environ.get("NAVAJA_CACHE", Path.home() / ".cache" / "navaja"))
 MODELOS = CACHE / "modelos"
 
-# En CPU el tiempo crece con los píxeles (768x1024 pasó de 28 min con 4 núcleos):
+# En CPU el tiempo crece con los píxeles (4 núcleos: 576x768 tarda ~20 min; 768x1024 pasó de 28):
 # lado mayor 768. En la GPU del Space, las resoluciones grandes.
 LOCAL = {"1:1": (768, 768), "3:4": (576, 768), "4:3": (768, 576), "9:16": (432, 768),
          "16:9": (768, 432), "2:3": (512, 768), "3:2": (768, 512)}
@@ -127,7 +127,7 @@ def main() -> int:
                 f"GPU gratis no disponible: {motivo}.\n"
                 + (f"Hechas: {', '.join(hechas)}\n" if hechas else "")
                 + "Opciones: guardar un HF_TOKEN gratuito en los secretos del entorno, esperar a que se "
-                "renueve la cuota, o --motor local (más de 15 min por imagen en CPU)."
+                "renueve la cuota, o --motor local (unos 20 min por imagen en CPU)."
             )
         return 0
     local(a.prompts, a.formato, a.semilla, destino)

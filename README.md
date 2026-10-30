@@ -27,7 +27,7 @@ Para sesiones en la nube (empiezan vacías: primero `/instalar`).
 | `/instalar [todo\|video\|audio\|clon\|imagen\|web]` | Instala lo necesario en la sesión y carga tus cookies | ✓ |
 | `ver-medios` | Ve vídeos de TikTok, Instagram, YouTube o archivos: una hoja con fotogramas clave + transcripción, con pocos tokens | TikTok ✓ · YouTube: datos y subtítulos ✓, el vídeo lo bloquea desde servidores (prueba con cookies) |
 | `audio` | Transcribe (Whisper), voz en español (Piper), clona tu voz (Chatterbox) y analiza música (tempo, tonalidad, secciones, pulsos) | Whisper ✓ · Piper ✓ · música ✓ |
-| `crear-imagenes` | Imágenes realistas con Z-Image-Turbo o Qwen-Image (modelos chinos abiertos) gratis, y diseños con texto exacto desde HTML | HTML ✓ · GPU de Hugging Face: necesita `HF_TOKEN` · CPU local: funciona pero tarda mucho |
+| `crear-imagenes` | Imágenes realistas con Z-Image-Turbo o Qwen-Image (modelos chinos abiertos) gratis, y diseños con texto exacto desde HTML | HTML ✓ · GPU de Hugging Face: necesita `HF_TOKEN` · CPU local ✓ (~20 min por imagen) |
 | `crear-videos` | Vídeos narrados (voz + imágenes/clips + subtítulos + música), recetas de edición con ffmpeg, animados con código | Narrado vertical ✓ |
 | `web-auto` | Navegador real con tus cookies: extraer datos, tareas con tu cuenta, probar tus apps (móvil/escritorio), publicar vía Buffer o Metricool | ✓ |
 
@@ -38,7 +38,7 @@ Todo el trabajo pesado está en scripts: Claude los ejecuta con argumentos en ve
 - `NAVAJA_COOKIES`: tus cookies para Instagram, TikTok, YouTube y webs con tu cuenta. Exporta con la extensión Cookie-Editor (formato JSON) desde un navegador con extensiones; también vale un cookies.txt o cualquiera de los dos en base64. Usa una cuenta secundaria si te preocupa un bloqueo.
 - `HF_TOKEN`: token de lectura de una cuenta gratuita de Hugging Face. Da cuota diaria de GPU gratis para generar imágenes en segundos.
 
-Límites de esta nube: el proxy no deja pasar WebSockets (por eso no hay voces de Microsoft Edge), YouTube bloquea la descarga de vídeo desde servidores, y no hay GPU: generar imágenes en local lleva más de 15 minutos por imagen, así que lo normal es la GPU gratis de Hugging Face (`HF_TOKEN`).
+Límites de esta nube: el proxy no deja pasar WebSockets (por eso no hay voces de Microsoft Edge), YouTube bloquea la descarga de vídeo desde servidores, y no hay GPU: generar imágenes en local lleva unos 20 minutos por imagen (576×768), así que lo normal es la GPU gratis de Hugging Face (`HF_TOKEN`).
 
 ## `router-ia`: skill y subagentes
 

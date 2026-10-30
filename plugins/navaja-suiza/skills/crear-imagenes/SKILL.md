@@ -14,7 +14,7 @@ python3 scripts/imagen.py "prompt 1" ["prompt 2"...] --formato 3:4 [--modelo z-i
 ```
 
 - Por defecto usa la GPU gratis de Hugging Face (segundos por imagen, cuota diaria). Necesita el secreto `HF_TOKEN` de una cuenta gratuita; si falta o se acaba la cuota, el script lo dice y no genera.
-- `--motor local` genera en la CPU del servidor sin cuentas ni límites, pero tarda más de 15 min por imagen: úsalo solo si la persona acepta esperar, en segundo plano.
+- `--motor local` genera en la CPU del servidor sin cuentas ni límites, pero tarda unos 20 min por imagen: úsalo solo si la persona acepta esperar, en segundo plano.
 - `--modelo qwen` (solo en GPU) es el mejor modelo abierto; úsalo para la versión final, no para probar.
 - Varias imágenes: pásalas en una sola llamada (el modelo se carga una vez).
 - Escribe el prompt en inglés y concreto: sujeto, acción, lugar, luz, cámara y objetivo, textura ("natural skin texture, film grain"). Para variar sin cambiar el prompt, cambia `--semilla`.

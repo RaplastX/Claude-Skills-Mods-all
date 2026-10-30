@@ -1,0 +1,16 @@
+{
+  "name": "claude-skills-mods-all",
+  "owner": { "name": "RaplastX" },
+  "plugins": [
+    {
+      "name": "router-ia",
+      "source": "./plugins/router-ia",
+      "description": "Skill y subagentes Haiku/Sonnet/Opus para elegir modelo y esfuerzo según la tarea (chat, Cowork y Claude Code)."
+    },
+    {
+      "name": "router-ia-auto",
+      "source": "./mods/router-ia-auto",
+      "description": "Mod de Claude Code: cambia solo de modelo y esfuerzo en cada turno sin perder la caché."
+    }
+  ]
+}

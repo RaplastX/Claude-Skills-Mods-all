@@ -1,0 +1,30 @@
+{
+  "name": "router-ia-auto",
+  "version": "0.1.0",
+  "description": "Cambia solo de modelo (Haiku, Sonnet, Opus) y de esfuerzo en cada turno según la tarea, sin perder la caché.",
+  "author": {
+    "name": "RaplastX"
+  },
+  "homepage": "https://github.com/RaplastX/Claude-Skills-Mods-all",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "modo": {
+      "type": "string",
+      "title": "Modo por defecto",
+      "description": "auto: elige solo. ahorro: evita Opus. calidad: nunca Haiku. off: no toca el modelo.",
+      "default": "auto",
+      "options": [
+        "auto",
+        "ahorro",
+        "calidad",
+        "off"
+      ]
+    },
+    "umbral_cache": {
+      "type": "number",
+      "title": "Umbral de caché (tokens)",
+      "description": "Con más contexto que esto, solo baja de modelo si la tarea sigue siendo ligera dos turnos seguidos.",
+      "default": 30000
+    }
+  }
+}

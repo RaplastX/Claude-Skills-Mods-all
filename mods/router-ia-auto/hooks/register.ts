@@ -257,6 +257,15 @@ export const register: Register = (on, options) => {
       routed: sent !== e,
     })
 
+    if (e.agentId === undefined && result.usage?.model) {
+      const tier = tierOf(result.usage.model) ?? result.usage.model
+      const asked = tierOf(sent.model)
+
+      $.ui.status(
+        `ruta: atendió ${tier}${sent.effort === undefined ? '' : ` · ${sent.effort}`}${asked && asked !== tier ? ` (pedido ${asked})` : ''}`,
+      )
+    }
+
     return result
   })
 

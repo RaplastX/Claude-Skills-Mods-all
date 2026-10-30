@@ -1,7 +1,7 @@
 ---
 name: instalar
 description: Instala en esta sesión en la nube las herramientas de la navaja suiza (vídeo, audio, voz, clonar voz, imágenes, web).
-argument-hint: "[todo|video|audio|clon|imagen|web]"
+argument-hint: "[todo|video|audio|clon|docs|imagen|web]"
 disable-model-invocation: true
 ---
 

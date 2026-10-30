@@ -99,6 +99,11 @@ imagen() {
   [ -n "${HF_TOKEN:-}" ] && bien "HF_TOKEN: Spaces con GPU gratis" || bien "sin HF_TOKEN: solo motor local"
 }
 
+docs() {
+  paso "documentos y OCR: RapidOCR, PyMuPDF y MarkItDown"
+  if pip_i rapidocr-onnxruntime pymupdf "markitdown[pdf,docx,pptx,xlsx]"; then bien "ocr y documentos"; else mal docs "ver $LOG"; fi
+}
+
 web() {
   paso "web: Playwright (Chromium ya viene en la imagen)"
   if node -e "require('playwright')" 2>/dev/null; then bien "playwright"; else mal web "playwright no disponible"; fi
@@ -115,14 +120,15 @@ pedidos=("$@")
 base
 for p in "${pedidos[@]}"; do
   case "$p" in
-  todo) audio; imagen; web; clon ;;
+  todo) audio; docs; imagen; web; clon ;;
   base) ;;
   audio | voz) audio ;;
   video) video ;;
   clon) clon ;;
   imagen | imagenes) imagen ;;
+  docs | ocr | documentos) docs ;;
   web) web ;;
-  *) mal "$p" "componente desconocido (usa todo, video, audio, voz, clon, imagen o web)" ;;
+  *) mal "$p" "componente desconocido (usa todo, video, audio, voz, clon, docs, imagen o web)" ;;
   esac
 done
 

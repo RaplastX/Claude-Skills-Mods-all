@@ -1,5 +1,8 @@
 # Cambios
 
+## 0.3.0 — navaja-suiza
+- Skills nuevas: `ocr` (RapidOCR), `documentos` (PyMuPDF y MarkItDown) y `ahorro`. `/instalar docs`.
+
 ## 0.2.0 — ruteo verificable (fase 1)
 
 **router-ia-auto (mod)**

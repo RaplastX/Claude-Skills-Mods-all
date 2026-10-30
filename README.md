@@ -29,6 +29,9 @@ Para sesiones en la nube (empiezan vacías: primero `/instalar`).
 | `audio` | Transcribe (Whisper), voz en español (Piper), clona tu voz (Chatterbox) y analiza música (tempo, tonalidad, secciones, pulsos) | Whisper ✓ · Piper ✓ · música ✓ |
 | `crear-imagenes` | Imágenes realistas con Z-Image-Turbo o Qwen-Image (modelos chinos abiertos) gratis, y diseños con texto exacto desde HTML | HTML ✓ · GPU de Hugging Face: necesita `HF_TOKEN` · CPU local ✓ (~20 min por imagen) |
 | `crear-videos` | Vídeos narrados (voz + imágenes/clips + subtítulos + música), recetas de edición con ffmpeg, animados con código | Narrado vertical ✓ |
+| `ocr` | Lee texto de capturas y da coordenadas de botones, en local y gratis | ✓ (pierde tildes) |
+| `documentos` | PDF, Word, PowerPoint, Excel y URLs a Markdown con tablas, recortado | ✓ PDF y Markdown |
+| `ahorro` | Reglas para gastar pocos tokens y un CLAUDE.md corto para tus repos | — |
 | `web-auto` | Navegador real con tus cookies: extraer datos, tareas con tu cuenta, probar tus apps (móvil/escritorio), publicar vía Buffer o Metricool | ✓ |
 
 Todo el trabajo pesado está en scripts: Claude los ejecuta con argumentos en vez de escribir código cada vez, y devuelven resúmenes cortos. Así se gastan pocos tokens.

@@ -6,10 +6,10 @@ description: Ver y entender vídeos de YouTube, TikTok, Instagram, X y otras web
 # Ver vídeos y audios
 
 ```bash
-python3 scripts/ver.py "URL_O_ARCHIVO" [--fotos 12] [--desde 1:00 --hasta 2:30] [--solo-audio] [--guardar-video]
+python3 ${CLAUDE_SKILL_DIR}/scripts/ver.py "URL_O_ARCHIVO" [--fotos 12] [--desde 1:00 --hasta 2:30] [--solo-audio] [--guardar-video]
 ```
 
-Rutas relativas al directorio base de esta skill. Si falta `yt-dlp`, ejecuta antes `bash ../instalar/scripts/instalar.sh audio`.
+Si falta `yt-dlp`, ejecuta antes `bash ${CLAUDE_SKILL_DIR}/../instalar/scripts/instalar.sh audio`.
 
 Deja en `~/navaja-salida/ver/`:
 - `texto.md`: datos (autor, vistas, descripción) y transcripción por bloques con minutos. Usa los subtítulos del vídeo si existen; si no, Whisper.

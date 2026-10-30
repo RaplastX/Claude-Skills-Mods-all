@@ -5,12 +5,12 @@ description: Crear imágenes realistas con IA gratis (Z-Image-Turbo y Qwen-Image
 
 # Crear imágenes
 
-Rutas relativas al directorio base de esta skill. Si falta el motor: `bash ../instalar/scripts/instalar.sh imagen`.
+Si falta el motor: `bash ${CLAUDE_SKILL_DIR}/../instalar/scripts/instalar.sh imagen`.
 
 **Fotos e ilustraciones con IA:**
 
 ```bash
-python3 scripts/imagen.py "prompt 1" ["prompt 2"...] --formato 3:4 [--modelo z-image|qwen] [--semilla 7] [--motor space|local]
+python3 ${CLAUDE_SKILL_DIR}/scripts/imagen.py "prompt 1" ["prompt 2"...] --formato 3:4 [--modelo z-image|qwen] [--semilla 7] [--motor space|local]
 ```
 
 - Por defecto usa la GPU gratis de Hugging Face (segundos por imagen, cuota diaria). Necesita el secreto `HF_TOKEN` de una cuenta gratuita; si falta o se acaba la cuota, el script lo dice y no genera.
@@ -23,7 +23,7 @@ python3 scripts/imagen.py "prompt 1" ["prompt 2"...] --formato 3:4 [--modelo z-i
 **Diseños con texto exacto** (miniaturas de YouTube, banners, portadas): escribe un HTML con el diseño (puede incluir imágenes generadas) y conviértelo:
 
 ```bash
-node scripts/html2png.mjs diseno.html salida.png --ancho 1280 --alto 720
+node ${CLAUDE_SKILL_DIR}/scripts/html2png.mjs diseno.html salida.png --ancho 1280 --alto 720
 ```
 
 Tienes también Canva conectado (`generate-design`, `generate-image`) si la persona prefiere sus plantillas.

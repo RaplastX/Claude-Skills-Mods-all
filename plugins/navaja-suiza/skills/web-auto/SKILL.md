@@ -5,12 +5,11 @@ description: Controlar webs con un navegador real: investigar y extraer datos, h
 
 # Webs y automatización
 
-Rutas relativas al directorio base de esta skill.
 
 **Script (rápido y con tus cookies):**
 
 ```bash
-node scripts/navegar.mjs URL [--movil] [--captura f.png] [--pagina-entera] [--texto 4000] [--pasos pasos.json] [--guardar-sesion]
+node ${CLAUDE_SKILL_DIR}/scripts/navegar.mjs URL [--movil] [--captura f.png] [--pagina-entera] [--texto 4000] [--pasos pasos.json] [--guardar-sesion]
 ```
 
 Devuelve título, texto de la página (recortado a `--texto` caracteres), errores de consola y red, y capturas. Con `--pasos` hace clics, escribe, pulsa teclas, espera, extrae texto o evalúa JS (formato en la cabecera del script). Usa las cookies de `NAVAJA_COOKIES` si se instalaron con `/instalar`.

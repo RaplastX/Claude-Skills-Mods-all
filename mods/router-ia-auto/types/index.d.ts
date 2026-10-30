@@ -5,6 +5,16 @@ export type Mode = 'auto' | 'ahorro' | 'calidad' | 'fijo' | 'off'
 // Lo que el router decidió para el siguiente turno y por qué.
 export type Route = { tier: Tier; effort: Effort; reason: string }
 
+// Una petición al modelo: lo que se pidió y lo que el servidor dice que respondió.
+export type Served = {
+  at: number
+  agent: string
+  asked: string
+  served: string
+  effort: string | null
+  routed: boolean
+}
+
 declare module 'claude-code' {
   interface PluginState {
     'router-ia-auto': {
@@ -14,6 +24,7 @@ declare module 'claude-code' {
       pinned: Shaped<Route | null>
       // Turnos seguidos que pedían un modelo menor (para no ir y volver).
       downStreak: number
+      served: Shaped<Served[]>
     }
   }
 }

@@ -181,17 +181,20 @@ export type DecideInput = {
   prev: Route | null
   // Tokens que se reenvían en la próxima petición (contexto actual).
   contextTokens: number
-  // Por encima de esto, bajar de modelo exige que la tarea siga siendo ligera
-  // dos turnos seguidos: un cambio de ida y vuelta re-cachea todo dos veces.
+  // Por encima de esto, bajar de Opus a Sonnet exige que la tarea siga
+  // pidiéndolo dos turnos seguidos: Sonnet tiene que cachear todo el contexto.
   cacheThreshold: number
   // Turnos seguidos que ya pedían un modelo menor que el actual.
   downStreak: number
+  // Clasificación de Haiku para un caso dudoso (modo mixto); manda sobre las reglas.
+  hint?: Route
 }
 
 export type Decision = { route: Route; downStreak: number }
 
 export const decide = (input: DecideInput): Decision => {
-  const { text, mode, prev, contextTokens, cacheThreshold, downStreak } = input
+  const { text, mode, prev, contextTokens, cacheThreshold, downStreak, hint } =
+    input
   const norm = normalize(text)
   const tierTag = TAG_TIER.exec(text)?.[2]?.toLowerCase() as Tier | undefined
   const effortTagWord = TAG_EFFORT.exec(text)?.[2]
@@ -233,7 +236,7 @@ export const decide = (input: DecideInput): Decision => {
     tier = 'sonnet'
     effort = 'high'
   } else if (!isBuild && text.length < 120 && /\?\s*$/.test(norm)) {
-    tier = 'sonnet'
+    tier = 'haiku'
     effort = 'low'
   } else {
     tier = 'sonnet'
@@ -246,7 +249,7 @@ export const decide = (input: DecideInput): Decision => {
 
   if (hard.length > 0) {
     why = hard.map(s => s.name).join(', ')
-  } else if (tier === 'haiku') {
+  } else if (tier === 'haiku' && light.length > 0) {
     why = `tarea mecánica: ${light.map(s => s.name).join(', ')}`
   } else if (size > 0) {
     why = 'petición larga o con muchos requisitos'
@@ -254,6 +257,12 @@ export const decide = (input: DecideInput): Decision => {
     why = 'pregunta corta'
   } else {
     why = isBuild ? 'implementación normal' : 'tarea general'
+  }
+
+  if (hint) {
+    tier = hint.tier
+    effort = hint.effort
+    why = `según Haiku: ${hint.reason}`
   }
 
   if (mode === 'ahorro') {
@@ -287,20 +296,17 @@ export const decide = (input: DecideInput): Decision => {
     why += `; esfuerzo elegido por ti`
   }
 
-  // Cambiar de modelo tira la caché del contexto: con un contexto grande,
-  // bajar de modelo para un solo turno sale más caro que quedarse.
+  // La caché es de cada modelo. Bajar a Haiku compensa siempre (su entrada sin
+  // caché cuesta menos que leer la caché de Opus); bajar de Opus a Sonnet obliga
+  // a Sonnet a cachear todo el contexto, así que con contexto grande se espera a
+  // que la tarea lo siga pidiendo un segundo turno.
   const isDowngrade = prev !== null && rank(tier) < rank(prev.tier)
-  const streak = isDowngrade ? downStreak + 1 : 0
+  const recaches = isDowngrade && tier === 'sonnet'
+  const streak = recaches ? downStreak + 1 : 0
 
-  if (
-    !tierTag &&
-    isDowngrade &&
-    contextTokens >= cacheThreshold &&
-    streak < 2
-  ) {
+  if (!tierTag && recaches && contextTokens >= cacheThreshold && streak < 2) {
     const kept = prev.tier
-    effort = tier === 'haiku' ? 'low' : effort
-    why += `; se mantiene ${kept} para no perder la caché (~${Math.round(contextTokens / 1000)}k tokens)`
+    why += `; se mantiene ${kept} para no re-cachear ~${Math.round(contextTokens / 1000)}k tokens en Sonnet`
     tier = kept
 
     return { route: { tier, effort, reason: why }, downStreak: streak }
@@ -308,6 +314,93 @@ export const decide = (input: DecideInput): Decision => {
 
   return { route: { tier, effort, reason: why }, downStreak: 0 }
 }
+
+// Reglas sin señal clara: en modo mixto se le pregunta a Haiku.
+const GENERIC = [
+  'tarea general',
+  'implementación normal',
+  'petición larga o con muchos requisitos',
+]
+
+export const isAmbiguous = (text: string, route: Route): boolean =>
+  text.length >= 200 && GENERIC.some(g => route.reason.startsWith(g))
+
+export const CLASSIFIER_SYSTEM = [
+  'Clasificas tareas para elegir el modelo de Claude que debe resolverlas.',
+  'haiku: mecánico o acotado (buscar, listar, renombrar, formatear, resumir, extraer, preguntas simples).',
+  'sonnet: programación y análisis habituales (implementar, corregir bugs normales, tests, revisar, investigar).',
+  'opus: razonamiento profundo (arquitectura, seguridad, concurrencia, bugs difíciles o sin causa clara, decisiones críticas con muchas dependencias).',
+  'Esfuerzo: low, medium, high o xhigh según cuánto razonamiento haga falta.',
+  'Responde SOLO con JSON: {"modelo":"haiku|sonnet|opus","esfuerzo":"low|medium|high|xhigh","motivo":"<6 palabras>"}',
+].join('\n')
+
+export const parseHint = (text: string): Route | undefined => {
+  const json = /\{[^{}]*\}/.exec(text)?.[0]
+
+  if (!json) {
+    return undefined
+  }
+
+  try {
+    const data = JSON.parse(json) as Record<string, unknown>
+    const tier = String(data.modelo ?? '').toLowerCase()
+    const effort = String(data.esfuerzo ?? '').toLowerCase()
+
+    if (!(TIERS as readonly string[]).includes(tier)) {
+      return undefined
+    }
+
+    return {
+      tier: tier as Tier,
+      effort: (EFFORTS as readonly string[]).includes(effort)
+        ? (effort as Effort)
+        : 'medium',
+      reason: String(data.motivo ?? 'sin motivo').slice(0, 60),
+    }
+  } catch {
+    return undefined
+  }
+}
+
+// Las clases de tarea del documento de requisitos, con lo que se espera.
+export const CASES: readonly { name: string; text: string; tier: Tier }[] = [
+  { name: 'pregunta simple', text: '¿Qué es un archivo .env?', tier: 'haiku' },
+  {
+    name: 'resumen corto',
+    text: 'resume este párrafo en dos líneas',
+    tier: 'haiku',
+  },
+  {
+    name: 'investigación corriente',
+    text: 'investiga qué librerías de gráficos para React se usan más y compáralas brevemente',
+    tier: 'sonnet',
+  },
+  {
+    name: 'programación habitual',
+    text: 'implementa un endpoint POST /usuarios con validación y tests',
+    tier: 'sonnet',
+  },
+  {
+    name: 'debugging complejo',
+    text: 'hay un bug intermitente en la cola de trabajos, no sé por qué se pierden mensajes con concurrencia alta',
+    tier: 'opus',
+  },
+  {
+    name: 'diseño de arquitectura',
+    text: 'diseña la arquitectura del sistema de pagos con colas y revisa la seguridad',
+    tier: 'opus',
+  },
+  {
+    name: 'análisis visual',
+    text: 'mira esta captura y dime qué botón falla',
+    tier: 'sonnet',
+  },
+  {
+    name: 'investigación técnica profunda',
+    text: 'piensa a fondo y compara arquitecturas distribuidas para escalar a millones de usuarios',
+    tier: 'opus',
+  },
+]
 
 export type Command =
   | { kind: 'show' }
@@ -377,6 +470,9 @@ export const HELP = [
   '/ruta calidad         nunca Haiku y sube el esfuerzo',
   '/ruta opus alto       fija modelo y esfuerzo hasta /ruta auto',
   '/ruta off             no toca nada (eliges tú con /model)',
+  '/ruta-estado          qué modelo atendió de verdad cada petición',
+  '/ruta-auditar         qué partes del ruteo funcionan en esta sesión',
+  '/ruta-probar [vivo]   prueba el clasificador; "vivo" pregunta a cada modelo',
   '',
   'En un mensaje: +opus, +sonnet, +haiku y +bajo, +medio, +alto, +muy-alto, +max',
   'cambian solo ese mensaje.',

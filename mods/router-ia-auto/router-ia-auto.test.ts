@@ -1,7 +1,19 @@
 import { describe, expect, test } from 'claude-code/testing'
 
-import { decide, parseCommand, stripTags } from './hooks/classify'
+import {
+  CASES,
+  decide,
+  parseCommand,
+  parseHint,
+  stripTags,
+} from './hooks/classify'
 import type { DecideInput } from './hooks/classify'
+
+// Lo que el motor pone en cada comando que escribe la persona.
+const typedCommand = {
+  origin: { kind: 'composer' },
+  presentation: { isFullscreen: false, columns: 80 },
+} as const
 
 const base: DecideInput = {
   text: '',
@@ -84,28 +96,34 @@ describe('clasificador', () => {
 
 describe('caché', () => {
   const prev = { tier: 'opus', effort: 'high', reason: 'x' } as const
-  const light = 'renombra la variable x a y'
+  const build = 'implementa un endpoint POST /usuarios con validación y tests'
 
-  test('con poco contexto baja de modelo enseguida', async () => {
-    expect(route(light, { prev, contextTokens: 5000 }).tier).toBe('haiku')
+  test('bajar a Haiku no espera, aunque el contexto sea grande', async () => {
+    expect(
+      route('renombra la variable x a y', { prev, contextTokens: 400000 }).tier,
+    ).toBe('haiku')
   })
 
-  test('con mucho contexto espera a un segundo turno ligero', async () => {
-    const first = decide({ ...base, text: light, prev, contextTokens: 90000 })
+  test('con poco contexto baja a Sonnet enseguida', async () => {
+    expect(route(build, { prev, contextTokens: 5000 }).tier).toBe('sonnet')
+  })
+
+  test('con mucho contexto, Sonnet espera a un segundo turno', async () => {
+    const first = decide({ ...base, text: build, prev, contextTokens: 90000 })
 
     expect(first.route.tier).toBe('opus')
-    expect(first.route.effort).toBe('low')
+    expect(first.route.effort).toBe('medium')
     expect(first.downStreak).toBe(1)
 
     const second = decide({
       ...base,
-      text: light,
+      text: build,
       prev: first.route,
       contextTokens: 90000,
       downStreak: first.downStreak,
     })
 
-    expect(second.route.tier).toBe('haiku')
+    expect(second.route.tier).toBe('sonnet')
     expect(second.downStreak).toBe(0)
   })
 
@@ -115,6 +133,29 @@ describe('caché', () => {
         prev: { tier: 'haiku', effort: 'low', reason: 'x' },
         contextTokens: 90000,
       }).tier,
+    ).toBe('opus')
+  })
+})
+
+describe('clases de tarea del documento', () => {
+  test('cada clase va al modelo esperado', async () => {
+    for (const c of CASES) {
+      expect(`${c.name}: ${route(c.text).tier}`).toBe(`${c.name}: ${c.tier}`)
+    }
+  })
+
+  test('la pista de Haiku manda sobre las reglas y se valida', async () => {
+    const hint = parseHint(
+      'Claro: {"modelo":"opus","esfuerzo":"high","motivo":"diseño con muchas dependencias"}',
+    )
+
+    expect(hint).toEqual(
+      expect.objectContaining({ tier: 'opus', effort: 'high' }),
+    )
+    expect(parseHint('{"modelo":"gpt"}')).toBe(undefined)
+    expect(parseHint('no sé')).toBe(undefined)
+    expect(
+      decide({ ...base, text: 'una tarea cualquiera', hint }).route.tier,
     ).toBe('opus')
   })
 })
@@ -146,8 +187,12 @@ test('el mensaje decide el modelo y el esfuerzo del bucle principal', async ($, 
   }))
   on('ui.status', () => ({ value: undefined }))
   on('prompt.submit', (_, e) => ({ text: e.text }))
+  on('clock.now', () => ({ value: Date.UTC(2026, 9, 30, 18, 5) }))
+  on('command.register', (_, e) => ({ value: { command: e.name } }))
   on('turn.step', async function* (_, e) {
     sent.push({ model: e.model, effort: e.effort, agentId: e.agentId })
+    // El servidor responde con el id completo del modelo que atendió.
+    const served = `claude-${e.model.replace(/^claude-/, '').replace(/-5-5$/, '')}-5-5`
 
     return {
       turnId: e.turnId,
@@ -155,15 +200,21 @@ test('el mensaje decide el modelo y el esfuerzo del bucle principal', async ($, 
       answer: '',
       toolUses: [],
       stopReason: 'end_turn',
-      usage: null,
+      usage: {
+        model: served,
+        input_tokens: 1,
+        output_tokens: 1,
+        cache_read_input_tokens: 0,
+        cache_creation_input_tokens: 0,
+      },
     }
   })
 
-  const step = async (agentId?: string) => {
+  const step = async (agentId?: string, model = 'claude-sonnet-5-5') => {
     const stream = $.turn.step({
       turnId: 't1',
       index: 0,
-      model: 'claude-sonnet-5-5',
+      model,
       effort: 'medium',
       messageCount: 1,
       ...(agentId ? { agentId } : {}),
@@ -206,4 +257,41 @@ test('el mensaje decide el modelo y el esfuerzo del bucle principal', async ($, 
   expect(sent[2]).toEqual(
     expect.objectContaining({ model: 'opus', effort: 'max' }),
   )
+
+  // Una skill con model: haiku ya eligió para su turno: el router no la pisa.
+  await step(undefined, 'claude-haiku-5-5')
+
+  expect(sent[3]).toEqual(
+    expect.objectContaining({ model: 'claude-haiku-5-5', effort: 'medium' }),
+  )
+
+  // /ruta-estado enseña lo pedido y lo que atendió el servidor.
+  const estado = await $.command.run({
+    ...typedCommand,
+    command: 'ruta-estado',
+    args: '',
+  })
+
+  expect(estado.text).toContain(
+    'principal: enrutado opus/max → claude-opus-5-5',
+  )
+  expect(estado.text).toContain(
+    'subagente subagent: claude-sonnet-5-5/medium → claude-sonnet-5-5',
+  )
+  expect(estado.text).toContain(
+    'principal: claude-haiku-5-5/medium → claude-haiku-5-5',
+  )
+})
+
+test('/ruta-probar acierta las 8 clases sin gastar nada', async ($, on) => {
+  on('command.register', (_, e) => ({ value: { command: e.name } }))
+
+  const probar = await $.command.run({
+    ...typedCommand,
+    command: 'ruta-probar',
+    args: '',
+  })
+
+  expect(probar.text).not.toContain('✗')
+  expect(probar.text?.match(/✓/g)?.length).toBe(8)
 })

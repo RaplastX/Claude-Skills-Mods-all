@@ -1,6 +1,6 @@
 {
   "name": "router-ia-auto",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Cambia solo de modelo (Haiku, Sonnet, Opus) y de esfuerzo en cada turno según la tarea, sin perder la caché.",
   "author": {
     "name": "RaplastX"
@@ -25,6 +25,16 @@
       "title": "Umbral de caché (tokens)",
       "description": "Con más contexto que esto, solo baja de modelo si la tarea sigue siendo ligera dos turnos seguidos.",
       "default": 30000
+    },
+    "clasificador": {
+      "type": "string",
+      "title": "Clasificador",
+      "description": "reglas: sin coste. mixto: en los casos dudosos pregunta a Haiku (gasta un poco de uso).",
+      "default": "reglas",
+      "options": [
+        "reglas",
+        "mixto"
+      ]
     }
   }
 }

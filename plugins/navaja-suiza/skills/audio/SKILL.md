@@ -5,14 +5,14 @@ description: Escuchar audio (transcribir con marcas de tiempo), generar voz en e
 
 # Audio
 
-Rutas relativas al directorio base de esta skill. Si falta algo: `bash ../instalar/scripts/instalar.sh audio` (o `clon` para clonar voz).
+Si falta algo: `bash ${CLAUDE_SKILL_DIR}/../instalar/scripts/instalar.sh audio` (o `clon` para clonar voz).
 
 | Tarea | Comando |
 | --- | --- |
-| Transcribir | `python3 scripts/transcribir.py archivo [--idioma es] [--srt subs.srt] [--palabras palabras.json]` |
-| Voz en español | `python3 scripts/voz.py --texto "..." --salida voz.mp3 [--voz es_ES-davefx-medium] [--velocidad 1.1]` |
-| Clonar voz | `python3 scripts/voz.py --archivo guion.txt --clonar muestra.wav --salida voz.wav` |
-| Analizar música | `python3 scripts/musica.py cancion.mp3 [--pulsos pulsos.json]` |
+| Transcribir | `python3 ${CLAUDE_SKILL_DIR}/scripts/transcribir.py archivo [--idioma es] [--srt subs.srt] [--palabras palabras.json]` |
+| Voz en español | `python3 ${CLAUDE_SKILL_DIR}/scripts/voz.py --texto "..." --salida voz.mp3 [--voz es_ES-davefx-medium] [--velocidad 1.1]` |
+| Clonar voz | `python3 ${CLAUDE_SKILL_DIR}/scripts/voz.py --archivo guion.txt --clonar muestra.wav --salida voz.wav` |
+| Analizar música | `python3 ${CLAUDE_SKILL_DIR}/scripts/musica.py cancion.mp3 [--pulsos pulsos.json]` |
 
 - Transcribir: modelo `small` por defecto (rápido en CPU); `--modelo medium` solo si el audio es difícil. `--palabras` sirve para subtítulos palabra a palabra.
 - Voces disponibles: `es_MX-claude-high` (México, por defecto) y `es_ES-davefx-medium` (España).

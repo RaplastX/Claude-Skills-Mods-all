@@ -40,42 +40,36 @@ Todo el trabajo pesado está en scripts: Claude los ejecuta con argumentos en ve
 
 Límites de esta nube: el proxy no deja pasar WebSockets (por eso no hay voces de Microsoft Edge), YouTube bloquea la descarga de vídeo desde servidores, y no hay GPU: generar imágenes en local lleva unos 20 minutos por imagen (576×768), así que lo normal es la GPU gratis de Hugging Face (`HF_TOKEN`).
 
-## `router-ia`: skill y subagentes
+## `router-ia`: skill, subagentes y cambio de modelo por turno
 
-- `skills/router-ia`: tabla de qué modelo y esfuerzo usar según la tarea, reglas para no malgastar tokens (leer solo lo necesario, no delegar trivialidades, escalar con diagnóstico) y una lista de comprobación antes de entregar.
-- `agents/haiku-rapido` (Haiku, esfuerzo bajo): explorar, buscar, cambios mecánicos.
-- `agents/sonnet-constructor` (Sonnet, medio): implementar, corregir, tests.
-- `agents/opus-arquitecto` (Opus, alto): arquitectura, seguridad, bugs difíciles.
-
-Úsala escribiendo `/router-ia` al empezar una tarea grande, o deja que Claude la cargue cuando hables de ahorrar uso.
+- `skills/router-ia`: qué modelo y esfuerzo usar según la tarea, cómo repartir sin desperdiciar uso, el bloque de transparencia «DECISIÓN DE RUTA» y la lista de comprobación antes de entregar. En el chat recomienda el modelo y explica cómo cambiarlo (nombre del modelo junto al botón de enviar → modelo y Effort).
+- `/rapido`, `/estandar`, `/profundo` (solo Claude Code): skills con `model:` y `effort:` en la cabecera; ese turno lo hace Haiku·bajo, Sonnet·medio u Opus·alto y luego vuelve el modelo de la sesión. Es el mecanismo nativo de Claude Code.
+- Subagentes: `haiku-rapido` y `auditor-repo` (Haiku), `sonnet-constructor`, `probador` e `investigador` (Sonnet), `opus-arquitecto` (Opus), cada uno con las herramientas justas.
 
 ## `router-ia-auto`: el mod de Claude Code
 
-En cada mensaje tuyo lo clasifica con reglas (no gasta ni un token) y manda la petición al modelo y esfuerzo que tocan:
+En cada mensaje tuyo lo clasifica (reglas sin coste; opcionalmente pregunta a Haiku en los casos dudosos) y manda la petición al modelo y esfuerzo que tocan. **El selector de la app sigue mostrando el modelo de la sesión**: el mod cambia cada petición sin tocarlo. Para ver qué modelo trabajó de verdad, usa `/ruta-estado`.
 
 | Ejemplo | Ruta |
 | --- | --- |
+| «¿qué es un archivo .env?» | Haiku · bajo |
 | «renombra `userId` a `accountId`» | Haiku · bajo |
-| «implementa un buscador con filtros» | Sonnet · medio |
+| «implementa un endpoint con validación y tests» | Sonnet · medio |
 | «optimiza el rendimiento de esta consulta» | Sonnet · alto |
 | «diseña la arquitectura de pagos y revisa la seguridad» | Opus · alto |
 | «piensa a fondo: hay una condición de carrera intermitente» | Opus · muy alto |
 | «sí, hazlo» | la misma ruta que el mensaje anterior |
 
-Cuida la caché: cambiar de modelo obliga a reenviar todo el contexto a precio completo. Por eso, con mucho contexto (30.000 tokens por defecto), solo baja de modelo si la tarea sigue siendo ligera dos mensajes seguidos; mientras tanto se queda en el modelo actual con menos esfuerzo. Subir de modelo cuando hace falta es inmediato. Los subagentes conservan su propio modelo.
-
-La ruta actual se ve en la línea de estado. Comandos:
-
 ```
-/ruta                 muestra la ruta actual y por qué
-/ruta auto            elige solo (por defecto)
-/ruta ahorro          evita Opus y baja el esfuerzo cuando se puede
-/ruta calidad         nunca Haiku y sube el esfuerzo
-/ruta opus alto       fija modelo y esfuerzo hasta /ruta auto
-/ruta off             no toca nada (eliges tú con /model)
+/ruta                 ruta actual y por qué (auto, ahorro, calidad, off, o fijar: /ruta opus alto)
+/ruta-estado          qué modelo atendió de verdad cada petición (dato del servidor)
+/ruta-auditar         qué partes del ruteo funcionan en esta sesión
+/ruta-probar [vivo]   prueba el clasificador con 8 clases de tarea; "vivo" comprueba cada modelo
 ```
 
-En un mensaje puedes forzar solo ese turno con `+opus`, `+sonnet`, `+haiku` y `+bajo`, `+medio`, `+alto`, `+muy-alto`, `+max` (la etiqueta se quita antes de enviarlo). El modo por defecto y el umbral de caché se cambian en `/config`.
+En un mensaje puedes forzar solo ese turno con `+opus`, `+sonnet`, `+haiku` y `+bajo`, `+medio`, `+alto`, `+muy-alto`, `+max`. Respeta las skills que fijan modelo, los fallbacks y `opusplan`. Modo, umbral de caché y clasificador se cambian en `/config`.
+
+Todo el detalle (auditoría de lo anterior, mecanismos reales, cómo decide, caché, qué hacer si falla): [docs/MODEL-ROUTING.md](docs/MODEL-ROUTING.md).
 
 ## Instalar
 
@@ -89,7 +83,16 @@ En un mensaje puedes forzar solo ese turno con `+opus`, `+sonnet`, `+haiku` y `+
 
 Responde `y` para añadir el marketplace y elige el ámbito de usuario. Si el repositorio es privado, el equipo necesita acceso a él en GitHub y credenciales de git configuradas.
 
-**Chat de claude.ai y Cowork:** comprime la carpeta del plugin con `.claude-plugin/` en la raíz del zip (`cd plugins/router-ia && zip -r ../../router-ia.zip .`) y súbelo en **Personalizar → Plugins → Subir un plugin**. Los plugins guardados en tu cuenta también se sincronizan con Claude Code.
+**Desde el móvil (chat, Cowork y Claude Code en la nube):** sube los paquetes en **Personalizar → Plugins → Subir un plugin**. `bash scripts/empaquetar.sh` los genera en `dist/`:
+
+| Paquete | Para qué |
+| --- | --- |
+| `router-ia.plugin` | La skill del router (chat, Cowork, Code) + subagentes y `/rapido` `/estandar` `/profundo` (Code) |
+| `router-ia-auto.plugin` | El mod (Claude Code, también en la nube) |
+| `navaja-suiza.plugin` | Medios, voz, imágenes y webs (sesiones en la nube) |
+| `router-ia-chat.zip` | Solo la skill del router, sin nada de Claude Code: úsalo en vez de `router-ia.plugin` si solo usas el chat |
+
+Los plugins guardados en tu cuenta se cargan al **abrir** una sesión nueva de Claude Code: tras guardar o actualizar uno, empieza una sesión nueva.
 
 Si ya tienes `model-router-pro-mobile`, desactívalo: hace lo mismo y tener dos copias de los subagentes gasta contexto en cada sesión.
 
@@ -97,6 +100,7 @@ Si ya tienes `model-router-pro-mobile`, desactívalo: hace lo mismo y tener dos 
 
 - En el chat ningún plugin puede cambiar el modelo; la skill solo regula cómo trabaja Claude y te recomienda cambiarlo cuando importa.
 - El mod usa la API de mods de Claude Code (acceso anticipado, probada con la 2.1.314): puede cambiar entre versiones.
+- Cambiar de modelo o delegar en subagentes también gasta del límite de Claude Pro; el router ahorra eligiendo bien, no saltándose límites.
 - Solo usa los modelos que tenga tu plan. Si un modelo no admite esfuerzo, Claude Code lo ignora.
 - La clasificación por reglas acierta en lo habitual, no siempre: para eso están `+opus`, `/ruta` y `/ruta off`.
 
@@ -106,4 +110,8 @@ Si ya tienes `model-router-pro-mobile`, desactívalo: hace lo mismo y tener dos 
 claude plugin validate mods/router-ia-auto
 claude plugin test mods/router-ia-auto
 claude plugin validate plugins/router-ia
+claude plugin validate plugins/navaja-suiza
+bash scripts/empaquetar.sh
 ```
+
+Cambios: [CHANGELOG.md](CHANGELOG.md).

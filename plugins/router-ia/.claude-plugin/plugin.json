@@ -1,6 +1,6 @@
 {
   "name": "router-ia",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Elige modelo (Haiku, Sonnet, Opus) y esfuerzo según la tarea para trabajar con precisión gastando menos. Skill para chat, Cowork y Claude Code, con subagentes por modelo.",
   "author": { "name": "RaplastX" },
   "homepage": "https://github.com/RaplastX/Claude-Skills-Mods-all",

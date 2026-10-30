@@ -1,0 +1,27 @@
+# Cambios
+
+## 0.2.0 — ruteo verificable (fase 1)
+
+**router-ia-auto (mod)**
+- Registra en cada petición el modelo pedido y el que respondió según el servidor, también en los subagentes.
+- Comandos nuevos: `/ruta-estado`, `/ruta-auditar`, `/ruta-probar [vivo]`.
+- Respeta el modelo que ya eligió otro: skills con `model:`, fallbacks y `opusplan`.
+- Clasificador `mixto` opcional: pregunta a Haiku solo en los casos dudosos.
+- Preguntas sencillas a Haiku (antes, Sonnet bajo).
+- Regla de caché corregida: bajar a Haiku ya no espera; solo bajar de Opus a Sonnet con contexto grande espera un segundo turno.
+- Reconoce los mensajes de sesiones en la nube que llegan sin clasificar.
+
+**router-ia**
+- Skills con cambio de modelo nativo: `/rapido` (Haiku·bajo), `/estandar` (Sonnet·medio), `/profundo` (Opus·alto).
+- Subagentes nuevos: `auditor-repo` (Haiku), `probador` e `investigador` (Sonnet); herramientas mínimas por agente.
+- Bloque de transparencia «DECISIÓN DE RUTA» con solo datos comprobables; instrucciones exactas para cambiar modelo y esfuerzo en el chat.
+
+**navaja-suiza**
+- Rutas de scripts con `${CLAUDE_SKILL_DIR}`.
+
+**Repositorio**
+- `docs/MODEL-ROUTING.md` con la auditoría de lo anterior; `scripts/empaquetar.sh` genera los paquetes, incluido el ZIP solo para el chat.
+
+## 0.1.x
+
+- `router-ia`, `router-ia-auto` y `navaja-suiza` iniciales.

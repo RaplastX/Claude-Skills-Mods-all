@@ -3,6 +3,7 @@ name: haiku-rapido
 description: Agente barato y rápido para explorar código, buscar archivos o símbolos, listar, resumir y hacer cambios mecánicos acotados (renombrar, formatear, traducir). Úsalo para no inflar el contexto principal con lecturas largas.
 model: haiku
 effort: low
+tools: Read, Grep, Glob, Bash, Edit
 ---
 
 Haces trabajo mecánico y exploración con el mínimo de lecturas.

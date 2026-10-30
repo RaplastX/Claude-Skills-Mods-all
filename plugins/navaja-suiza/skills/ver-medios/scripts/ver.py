@@ -89,7 +89,12 @@ def subtitulos(datos: dict, carpeta: Path, url: str) -> str | None:
 
 def duracion(archivo: Path) -> float:
     r = corre("ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(archivo))
-    return float(r.stdout.strip() or 0)
+    try:
+        return float(r.stdout.strip())
+    except ValueError:
+        # ffprobe no lee algunos archivos: la cabecera de ffmpeg sí trae la duración.
+        m = re.search(r"Duration: (\d+):(\d+):([\d.]+)", corre("ffmpeg", "-i", str(archivo)).stderr)
+        return int(m.group(1)) * 3600 + int(m.group(2)) * 60 + float(m.group(3)) if m else 0.0
 
 
 def hoja(video: Path, salida: Path, fotos: int, desde: float, hasta: float) -> None:
@@ -146,7 +151,14 @@ def main() -> int:
     elif texto is None:
         origen = f"Whisper {a.modelo}"
         r = corre(sys.executable, str(TRANSCRIBIR), str(archivo), "--modelo", a.modelo)
-        texto = r.stdout.strip() if r.returncode == 0 else f"(sin transcripción: {r.stderr.strip()[-300:]})"
+        if r.returncode == 0:
+            texto = r.stdout.strip()
+        elif "CalledProcessError" in r.stderr and "ffmpeg" in r.stderr:
+            texto = ("(sin transcripción: el audio no se puede decodificar aquí. Suele ser xHE-AAC (USAC), "
+                     "el formato que usan algunos Reels; ffmpeg 7 no lo soporta. Alternativas: usar el enlace "
+                     "en vez del archivo, o leer los fotogramas y el texto en pantalla con la skill ocr)")
+        else:
+            texto = f"(sin transcripción: {r.stderr.strip()[-300:]})"
 
     cabecera = [f"# {datos.get('title', '')}"]
     for clave, nombre in (("uploader", "autor"), ("upload_date", "fecha"), ("view_count", "vistas"),

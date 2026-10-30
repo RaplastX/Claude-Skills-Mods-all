@@ -18,6 +18,11 @@
       "name": "navaja-suiza",
       "source": "./plugins/navaja-suiza",
       "description": "Ver vídeos de redes, transcribir y clonar voz, imágenes IA gratis, vídeos narrados y control de webs en sesiones en la nube."
+    },
+    {
+      "name": "diseno",
+      "source": "./plugins/diseno",
+      "description": "Diseño de interfaces (ui-ux-pro-max) y diagramas HTML/SVG (diagram-design), revisados y con descripciones cortas."
     }
   ]
 }

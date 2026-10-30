@@ -41,7 +41,16 @@ Todo el trabajo pesado está en scripts: Claude los ejecuta con argumentos en ve
 - `NAVAJA_COOKIES`: tus cookies para Instagram, TikTok, YouTube y webs con tu cuenta. Exporta con la extensión Cookie-Editor (formato JSON) desde un navegador con extensiones; también vale un cookies.txt o cualquiera de los dos en base64. Usa una cuenta secundaria si te preocupa un bloqueo.
 - `HF_TOKEN`: token de lectura de una cuenta gratuita de Hugging Face. Da cuota diaria de GPU gratis para generar imágenes en segundos.
 
-Límites de esta nube: el proxy no deja pasar WebSockets (por eso no hay voces de Microsoft Edge), YouTube bloquea la descarga de vídeo desde servidores, y no hay GPU: generar imágenes en local lleva unos 20 minutos por imagen (576×768), así que lo normal es la GPU gratis de Hugging Face (`HF_TOKEN`).
+Límites de esta nube: el proxy no deja pasar WebSockets (por eso no hay voces de Microsoft Edge), YouTube bloquea la descarga de vídeo desde servidores, el audio xHE-AAC de algunos Reels no se puede decodificar (se ven los fotogramas pero no se transcribe), y no hay GPU: generar imágenes en local lleva unos 20 minutos por imagen (576×768), así que lo normal es la GPU gratis de Hugging Face (`HF_TOKEN`).
+
+## `diseno`: interfaces y diagramas
+
+Dos skills de terceros (MIT), **revisadas antes de incluirlas** (ningún script de uso hace llamadas de red ni ejecuta comandos; detalle en `plugins/diseno/THIRD-PARTY.md`):
+
+- `ui-ux-pro-max`: base de datos local de estilos, paletas, tipografías y guías de UX por tecnología. Probada: genera un sistema de diseño.
+- `diagram-design`: diagramas en un solo HTML/SVG (más de 40 tipos). Probada: su comprobador valida una plantilla.
+
+Para no gastar contexto: se copió solo lo útil (no sus otras 6 skills ni hooks), con descripciones cortas. La skill de diagramas pesa unos 8k tokens al usarse; solo se carga cuando pides un diagrama.
 
 ## `router-ia`: skill, subagentes y cambio de modelo por turno
 
@@ -82,6 +91,7 @@ Todo el detalle (auditoría de lo anterior, mecanismos reales, cómo decide, cac
 /plugin install router-ia --marketplace RaplastX/Claude-Skills-Mods-all
 /plugin install router-ia-auto --marketplace RaplastX/Claude-Skills-Mods-all
 /plugin install navaja-suiza --marketplace RaplastX/Claude-Skills-Mods-all
+/plugin install diseno --marketplace RaplastX/Claude-Skills-Mods-all
 ```
 
 Responde `y` para añadir el marketplace y elige el ámbito de usuario. Si el repositorio es privado, el equipo necesita acceso a él en GitHub y credenciales de git configuradas.
@@ -93,6 +103,7 @@ Responde `y` para añadir el marketplace y elige el ámbito de usuario. Si el re
 | `router-ia.plugin` | La skill del router (chat, Cowork, Code) + subagentes y `/rapido` `/estandar` `/profundo` (Code) |
 | `router-ia-auto.plugin` | El mod (Claude Code, también en la nube) |
 | `navaja-suiza.plugin` | Medios, voz, imágenes y webs (sesiones en la nube) |
+| `diseno.plugin` | Diseño de interfaces y diagramas (terceros revisados) |
 | `router-ia-chat.zip` | Solo la skill del router, sin nada de Claude Code: úsalo en vez de `router-ia.plugin` si solo usas el chat |
 
 Los plugins guardados en tu cuenta se cargan al **abrir** una sesión nueva de Claude Code: tras guardar o actualizar uno, empieza una sesión nueva.

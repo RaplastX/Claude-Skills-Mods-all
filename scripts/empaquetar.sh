@@ -3,6 +3,7 @@
 #   router-ia.plugin        skill + subagentes + /rapido /estandar /profundo (Claude Code y Cowork; en el chat, la skill)
 #   router-ia-auto.plugin   el mod de Claude Code
 #   navaja-suiza.plugin     medios, voz, imágenes y webs (sesiones de Claude Code en la nube)
+#   diseno.plugin           ui-ux-pro-max y diagram-design (terceros, MIT, revisados)
 #   router-ia-chat.zip      solo la skill del router, para quien use únicamente el chat
 set -euo pipefail
 
@@ -18,6 +19,7 @@ empaqueta() { # carpeta destino
 empaqueta "$RAIZ/plugins/router-ia" "$DIST/router-ia.plugin"
 empaqueta "$RAIZ/mods/router-ia-auto" "$DIST/router-ia-auto.plugin"
 empaqueta "$RAIZ/plugins/navaja-suiza" "$DIST/navaja-suiza.plugin"
+empaqueta "$RAIZ/plugins/diseno" "$DIST/diseno.plugin"
 
 CHAT="$(mktemp -d)"
 mkdir -p "$CHAT/.claude-plugin" "$CHAT/skills"

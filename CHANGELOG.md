@@ -1,5 +1,9 @@
 # Cambios
 
+## 0.3.1
+- Plugin nuevo `diseno` (ui-ux-pro-max y diagram-design, revisados, con descripciones cortas).
+- `ver-medios`: lee la duración de archivos que ffprobe no abre y explica el fallo de audio xHE-AAC.
+
 ## 0.3.0 — navaja-suiza
 - Skills nuevas: `ocr` (RapidOCR), `documentos` (PyMuPDF y MarkItDown) y `ahorro`. `/instalar docs`.
 

@@ -1,9 +1,17 @@
 {
   "name": "diseno",
-  "version": "0.1.0",
-  "description": "Diseño de interfaces (ui-ux-pro-max) y diagramas HTML/SVG (diagram-design): dos skills de terceros con licencia MIT, revisadas y con descripciones cortas para no gastar contexto.",
-  "author": { "name": "RaplastX" },
+  "version": "0.2.0",
+  "description": "Diseño de interfaces (ui-ux-pro-max, frontend-design) y diagramas HTML/SVG (diagram-design). Terceros MIT y Apache 2.0, revisados.",
+  "author": {
+    "name": "RaplastX"
+  },
   "homepage": "https://github.com/RaplastX/Claude-Skills-Mods-all",
   "license": "MIT",
-  "keywords": ["design", "ui", "ux", "diagrams", "svg"]
+  "keywords": [
+    "design",
+    "ui",
+    "ux",
+    "diagrams",
+    "svg"
+  ]
 }

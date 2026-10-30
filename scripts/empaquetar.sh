@@ -20,6 +20,7 @@ empaqueta "$RAIZ/plugins/router-ia" "$DIST/router-ia.plugin"
 empaqueta "$RAIZ/mods/router-ia-auto" "$DIST/router-ia-auto.plugin"
 empaqueta "$RAIZ/plugins/navaja-suiza" "$DIST/navaja-suiza.plugin"
 empaqueta "$RAIZ/plugins/diseno" "$DIST/diseno.plugin"
+empaqueta "$RAIZ/plugins/desarrollo" "$DIST/desarrollo.plugin"
 
 CHAT="$(mktemp -d)"
 mkdir -p "$CHAT/.claude-plugin" "$CHAT/skills"

@@ -52,7 +52,22 @@ Dos skills de terceros (MIT), **revisadas antes de incluirlas** (ningún script 
 
 Para no gastar contexto: se copió solo lo útil (no sus otras 6 skills ni hooks), con descripciones cortas. La skill de diagramas pesa unos 8k tokens al usarse; solo se carga cuando pides un diagrama.
 
-## `router-ia`: skill, subagentes y cambio de modelo por turno
+## Skills de terceros: qué incluye y qué no
+
+Todo lo incluido está revisado (sin llamadas de red ni comandos ocultos) y lleva su licencia en su carpeta. Detalle por plugin en cada `THIRD-PARTY.md`.
+
+| Plugin | Skills | Licencia |
+| --- | --- | --- |
+| `diseno` | `ui-ux-pro-max`, `diagram-design`, `frontend-design` | MIT, MIT, Apache 2.0 |
+| `desarrollo` | `research`, `code-review`, `tdd` | MIT |
+| `navaja-suiza` | `hyperframes` (vídeo con HTML), `agent-browser` (instrucciones) | Apache 2.0 |
+
+**No incluidas, a propósito:**
+- **`pdf`, `docx`, `pptx` de Anthropic:** su licencia es propietaria («todos los derechos reservados»), no se pueden redistribuir. Instálalas tú desde el marketplace oficial de Anthropic: `/plugin marketplace add anthropics/skills`, luego `/plugin install` de `pdf`, `docx` o `pptx`. Son las mejores para PDF, Word y PowerPoint.
+- **`webapp-testing` de Anthropic:** no tiene licencia publicada.
+- **Las de pago** (Higgsfield, ElevenLabs, OpenAI transcribe, Firecrawl, Apify, scrapers de redes) y **las de vídeo con IA generativa** de pago.
+
+**`agent-browser`** necesita instalarse aparte (`npm i -g agent-browser`). Ese paso descarga un binario de GitHub; yo no lo he ejecutado. y cambio de modelo por turno
 
 - `skills/router-ia`: qué modelo y esfuerzo usar según la tarea, cómo repartir sin desperdiciar uso, el bloque de transparencia «DECISIÓN DE RUTA» y la lista de comprobación antes de entregar. En el chat recomienda el modelo y explica cómo cambiarlo (nombre del modelo junto al botón de enviar → modelo y Effort).
 - `/rapido`, `/estandar`, `/profundo` (solo Claude Code): skills con `model:` y `effort:` en la cabecera; ese turno lo hace Haiku·bajo, Sonnet·medio u Opus·alto y luego vuelve el modelo de la sesión. Es el mecanismo nativo de Claude Code.
@@ -92,6 +107,7 @@ Todo el detalle (auditoría de lo anterior, mecanismos reales, cómo decide, cac
 /plugin install router-ia-auto --marketplace RaplastX/Claude-Skills-Mods-all
 /plugin install navaja-suiza --marketplace RaplastX/Claude-Skills-Mods-all
 /plugin install diseno --marketplace RaplastX/Claude-Skills-Mods-all
+/plugin install desarrollo --marketplace RaplastX/Claude-Skills-Mods-all
 ```
 
 Responde `y` para añadir el marketplace y elige el ámbito de usuario. Si el repositorio es privado, el equipo necesita acceso a él en GitHub y credenciales de git configuradas.
@@ -104,6 +120,7 @@ Responde `y` para añadir el marketplace y elige el ámbito de usuario. Si el re
 | `router-ia-auto.plugin` | El mod (Claude Code, también en la nube) |
 | `navaja-suiza.plugin` | Medios, voz, imágenes y webs (sesiones en la nube) |
 | `diseno.plugin` | Diseño de interfaces y diagramas (terceros revisados) |
+| `desarrollo.plugin` | Investigación, revisión de código y TDD (terceros MIT, revisados) |
 | `router-ia-chat.zip` | Solo la skill del router, sin nada de Claude Code: úsalo en vez de `router-ia.plugin` si solo usas el chat |
 
 Los plugins guardados en tu cuenta se cargan al **abrir** una sesión nueva de Claude Code: tras guardar o actualizar uno, empieza una sesión nueva.

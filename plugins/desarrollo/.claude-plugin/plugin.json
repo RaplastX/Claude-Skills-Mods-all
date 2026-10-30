@@ -1,0 +1,9 @@
+{
+  "name": "desarrollo",
+  "version": "0.1.0",
+  "description": "Tres skills de desarrollo de mattpocock/skills (MIT), revisadas: investigar con fuentes primarias, revisar código y TDD con pruebas primero.",
+  "author": { "name": "RaplastX" },
+  "homepage": "https://github.com/RaplastX/Claude-Skills-Mods-all",
+  "license": "MIT",
+  "keywords": ["research", "code-review", "tdd", "testing"]
+}

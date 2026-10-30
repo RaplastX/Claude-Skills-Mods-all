@@ -1,5 +1,11 @@
 # Cambios
 
+## 0.4.0 — más skills revisadas
+- `diseno` 0.2.0: añade `frontend-design` (Apache 2.0).
+- `desarrollo` 0.1.0 (plugin nuevo): `research`, `code-review`, `tdd` (MIT).
+- `navaja-suiza` 0.4.0: añade `hyperframes` (Apache 2.0) y `agent-browser` (instrucciones, Apache 2.0).
+- No incluidas: `pdf`, `docx`, `pptx` de Anthropic (licencia propietaria) y las de pago.
+
 ## 0.3.1
 - Plugin nuevo `diseno` (ui-ux-pro-max y diagram-design, revisados, con descripciones cortas).
 - `ver-medios`: lee la duración de archivos que ffprobe no abre y explica el fallo de audio xHE-AAC.

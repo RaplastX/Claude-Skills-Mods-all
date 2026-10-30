@@ -6,7 +6,12 @@ import { HELP, decide, label, parseCommand, stripTags } from './classify'
 
 const COMMAND = 'ruta'
 const MODES = ['auto', 'ahorro', 'calidad', 'off'] as const
-const TYPED: ReadonlySet<string> = new Set(['composer', 'bridge', 'sdk'])
+const TYPED: ReadonlySet<string> = new Set([
+  'composer',
+  'bridge',
+  'sdk',
+  'unclassified',
+])
 
 // Cambia la etiqueta si cambia la forma de Route: descarta lo guardado antes.
 const modeAtom = atom({ plugin: 'router-ia-auto', key: 'mode' } as const, null)

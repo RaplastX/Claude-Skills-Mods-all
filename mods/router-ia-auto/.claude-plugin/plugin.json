@@ -1,6 +1,6 @@
 {
   "name": "router-ia-auto",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Cambia solo de modelo (Haiku, Sonnet, Opus) y de esfuerzo en cada turno según la tarea, sin perder la caché.",
   "author": {
     "name": "RaplastX"

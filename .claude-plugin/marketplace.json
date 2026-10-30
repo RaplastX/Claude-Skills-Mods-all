@@ -1,6 +1,8 @@
 {
   "name": "claude-skills-mods-all",
-  "owner": { "name": "RaplastX" },
+  "owner": {
+    "name": "RaplastX"
+  },
   "plugins": [
     {
       "name": "router-ia",
@@ -11,6 +13,11 @@
       "name": "router-ia-auto",
       "source": "./mods/router-ia-auto",
       "description": "Mod de Claude Code: cambia solo de modelo y esfuerzo en cada turno sin perder la caché."
+    },
+    {
+      "name": "navaja-suiza",
+      "source": "./plugins/navaja-suiza",
+      "description": "Ver vídeos de redes, transcribir y clonar voz, imágenes IA gratis, vídeos narrados y control de webs en sesiones en la nube."
     }
   ]
 }

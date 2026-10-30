@@ -16,6 +16,30 @@ Las dos cosas, porque cada una llega a un sitio distinto:
 
 Lo recomendable: instalar `router-ia` en tu cuenta (te sirve en los tres) y, si usas Claude Code, además `router-ia-auto`.
 
+**Desde el móvil en sesiones de Claude Code en la nube** (claude.ai/code con repos de GitHub) el mod sí funciona: se ejecuta dentro del Claude Code de la sesión, no en el teléfono. Es la mejor opción ahí; la skill lo complementa repartiendo trabajo entre subagentes.
+
+## `navaja-suiza`: medios, voz, imágenes y webs
+
+Para sesiones en la nube (empiezan vacías: primero `/instalar`).
+
+| Skill | Qué hace | Probado en la nube |
+| --- | --- | --- |
+| `/instalar [todo\|video\|audio\|clon\|imagen\|web]` | Instala lo necesario en la sesión y carga tus cookies | ✓ |
+| `ver-medios` | Ve vídeos de TikTok, Instagram, YouTube o archivos: una hoja con fotogramas clave + transcripción, con pocos tokens | TikTok ✓ · YouTube: datos y subtítulos ✓, el vídeo lo bloquea desde servidores (prueba con cookies) |
+| `audio` | Transcribe (Whisper), voz en español (Piper), clona tu voz (Chatterbox) y analiza música (tempo, tonalidad, secciones, pulsos) | Whisper ✓ · Piper ✓ · música ✓ |
+| `crear-imagenes` | Imágenes realistas con Z-Image-Turbo o Qwen-Image (modelos chinos abiertos) gratis, y diseños con texto exacto desde HTML | HTML ✓ · GPU de Hugging Face: necesita `HF_TOKEN` · CPU local: funciona pero tarda mucho |
+| `crear-videos` | Vídeos narrados (voz + imágenes/clips + subtítulos + música), recetas de edición con ffmpeg, animados con código | Narrado vertical ✓ |
+| `web-auto` | Navegador real con tus cookies: extraer datos, tareas con tu cuenta, probar tus apps (móvil/escritorio), publicar vía Buffer o Metricool | ✓ |
+
+Todo el trabajo pesado está en scripts: Claude los ejecuta con argumentos en vez de escribir código cada vez, y devuelven resúmenes cortos. Así se gastan pocos tokens.
+
+**Secretos del entorno** (menú del entorno en el título de la sesión → Edit; se aplican en la sesión siguiente, nunca los pegues en el chat):
+
+- `NAVAJA_COOKIES`: tus cookies para Instagram, TikTok, YouTube y webs con tu cuenta. Exporta con la extensión Cookie-Editor (formato JSON) desde un navegador con extensiones; también vale un cookies.txt o cualquiera de los dos en base64. Usa una cuenta secundaria si te preocupa un bloqueo.
+- `HF_TOKEN`: token de lectura de una cuenta gratuita de Hugging Face. Da cuota diaria de GPU gratis para generar imágenes en segundos.
+
+Límites de esta nube: el proxy no deja pasar WebSockets (por eso no hay voces de Microsoft Edge), YouTube bloquea la descarga de vídeo desde servidores, y no hay GPU: generar imágenes en local lleva más de 15 minutos por imagen, así que lo normal es la GPU gratis de Hugging Face (`HF_TOKEN`).
+
 ## `router-ia`: skill y subagentes
 
 - `skills/router-ia`: tabla de qué modelo y esfuerzo usar según la tarea, reglas para no malgastar tokens (leer solo lo necesario, no delegar trivialidades, escalar con diagnóstico) y una lista de comprobación antes de entregar.
@@ -60,6 +84,7 @@ En un mensaje puedes forzar solo ese turno con `+opus`, `+sonnet`, `+haiku` y `+
 ```
 /plugin install router-ia --marketplace RaplastX/Claude-Skills-Mods-all
 /plugin install router-ia-auto --marketplace RaplastX/Claude-Skills-Mods-all
+/plugin install navaja-suiza --marketplace RaplastX/Claude-Skills-Mods-all
 ```
 
 Responde `y` para añadir el marketplace y elige el ámbito de usuario. Si el repositorio es privado, el equipo necesita acceso a él en GitHub y credenciales de git configuradas.
